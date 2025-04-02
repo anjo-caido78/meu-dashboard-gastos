@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gastos Pessoais</title>
+    <!-- CSS básico -->
+     <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Meus Gastos</h1>
+    
+    <!-- Formulário para adicionar gastos -->
+    <form id="gastoForm">
+        <input type="date" id="data" required>
+        <input type="text" id="categoria" placeholder="Categoria" required>
+        <input type="number" id="valor" placeholder="Valor" required>
+        <button type="submit">Adicionar</button>
+    </form>
+    
+    <!-- Onde os resultados aparecerão -->
+    <div id="resumo"></div>
+    <div id="grafico"></div>
+    <table id="tabela">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Categoria</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    
+    <!-- Nosso JavaScript -->
+    <script src="LIs.js"></script>
+</body>
+</html>
