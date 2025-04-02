@@ -1,0 +1,104 @@
+// ================ CONSTANTES E ELEMENTOS ================
+const DOM = {
+  form: document.getElementById('gastoForm'),
+  data: document.getElementById('data'),
+  categoria: document.getElementById('categoria'),
+  valor: document.getElementById('valor'),
+  resumo: document.getElementById('resumo'),
+  tabela: document.querySelector('#tabela tbody')
+};
+
+// ================ CLASSE PRINCIPAL ================
+class GastoManager {
+  #gastos = []; // Propriedade privada
+
+  constructor() {
+    this.#carregarDados();
+    this.#iniciarEventos();
+    this.#renderizar();
+  }
+
+  // Carrega dados do localStorage
+  #carregarDados() {
+    const dados = localStorage.getItem('gastos');
+    this.#gastos = dados ? JSON.parse(dados) : [];
+  }
+
+  // Configura os eventos
+  #iniciarEventos() {
+    DOM.form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.#adicionarGasto({
+        data: DOM.data.value,
+        categoria: DOM.categoria.value,
+        valor: parseFloat(DOM.valor.value)
+      });
+      DOM.form.reset();
+    });
+  }
+
+  // Adiciona novo gasto (método privado)
+  #adicionarGasto(gasto) {
+    this.#gastos = [...this.#gastos, { ...gasto, id: Date.now() }];
+    this.#salvar();
+    this.#renderizar();
+  }
+
+  // Remove gasto por ID
+  removerGasto(id) {
+    this.#gastos = this.#gastos.filter(gasto => gasto.id !== id);
+    this.#salvar();
+    this.#renderizar();
+  }
+
+  // Salva no localStorage
+  #salvar() {
+    localStorage.setItem('gastos', JSON.stringify(this.#gastos));
+  }
+
+  // Atualiza a interface
+  #renderizar() {
+    this.#atualizarResumo();
+    this.#atualizarTabela();
+    this.#atualizarGrafico(); // Implemente depois se quiser
+  }
+
+  // Atualiza o resumo financeiro
+  #atualizarResumo() {
+    const total = this.#gastos.reduce((acc, { valor }) => acc + valor, 0);
+    const maior = Math.max(...this.#gastos.map(({ valor }) => valor), 0);
+    
+    DOM.resumo.innerHTML = `
+      <div class="card">
+        <h3>Total Gasto</h3>
+        <p>R$ ${total.toFixed(2)}</p>
+      </div>
+      <div class="card">
+        <h3>Maior Gasto</h3>
+        <p>R$ ${maior.toFixed(2)}</p>
+      </div>
+    `;
+  }
+
+  // Atualiza a tabela de gastos
+  #atualizarTabela() {
+    DOM.tabela.innerHTML = this.#gastos
+      .slice()
+      .reverse()
+      .map(({ id, data, categoria, valor }) => `
+        <tr>
+          <td>${new Date(data).toLocaleDateString('pt-BR')}</td>
+          <td>${categoria}</td>
+          <td>R$ ${valor.toFixed(2)}</td>
+          <td>
+            <button onclick="gastoManager.removerGasto(${id})">
+              ✕
+            </button>
+          </td>
+        </tr>
+      `).join('');
+  }
+}
+
+// ================ INICIALIZAÇÃO ================
+const gastoManager = new GastoManager();
